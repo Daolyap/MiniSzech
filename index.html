@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Szech & Poland — Baby Countdown</title>
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --black:#050505;
+    --pink-1:#ff6ab3;
+    --pink-2:#ff2d95;
+    --glass: rgba(255,255,255,0.04);
+    --muted: rgba(255,255,255,0.12);
+    --neon: 0 0 18px rgba(255,45,149,0.18), 0 0 36px rgba(255,106,179,0.10);
+    --card-radius:18px;
+  }
+  html,body{height:100%;margin:0;font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: radial-gradient(1200px 600px at 10% 10%, rgba(255,45,149,0.06), transparent), radial-gradient(900px 400px at 90% 90%, rgba(255,106,179,0.04), transparent), var(--bg); color:#fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+  /* subtle moving particles */
+  .scene{
+    position:fixed; inset:0; overflow:hidden; z-index:0;
+    background:linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 100%);
+  }
+  .particle{
+    position:absolute; border-radius:50%; opacity:0.08; mix-blend-mode:screen;
+    animation: drift linear infinite;
+    filter: blur(8px);
+  }
+  @keyframes drift {
+    from{ transform: translateY(-30vh) translateX(0) scale(0.6); opacity:0; }
+    10%{ opacity:0.06; }
+    50%{ opacity:0.08; }
+    to{ transform: translateY(120vh) translateX(40vw) scale(1); opacity:0; }
+  }
+
+  /* main layout */
+  .wrap{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:48px; z-index:1;}
+  .card{
+    width:100%; max-width:980px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:var(--card-radius); padding:28px; backdrop-filter: blur(6px) saturate(1.08);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.65), var(--neon); border:1px solid rgba(255,255,255,0.03);
+    display:grid; grid-template-columns: 1fr 360px; gap:22px; align-items:center;
+  }
+
+  /* left column: heading & countdown */
+  .title{
+    display:flex; gap:14px; align-items:center; margin-bottom:6px;
+  }
+  .title h1{ margin:0; font-size: clamp(22px, 3.2vw, 32px); letter-spacing:0.6px; font-weight:700; color:var(--pink-1); text-shadow: 0 0 10px rgba(255,106,179,0.12); }
+  .title .sub{ color:var(--muted); font-weight:600; font-size:14px; letter-spacing:0.4px; text-transform:uppercase; }
+
+  .accent-row{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .pill{ padding:8px 12px; background: linear-gradient(90deg, rgba(255,45,149,0.08), rgba(255,106,179,0.04)); border-radius:999px; color: #ffd9ef; font-weight:600; font-size:13px; box-shadow: 0 2px 10px rgba(255,45,149,0.03) inset; }
+
+  .countdown{
+    display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+  }
+  .segment{
+    background: linear-gradient(180deg, rgba(0,0,0,0.42), rgba(255,255,255,0.02));
+    padding:18px 22px; border-radius:12px; min-width:120px; text-align:center; box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.02);
+  }
+  .number{ font-size: clamp(28px, 4.4vw, 48px); font-weight:800; line-height:1; color:var(--pink-2); text-shadow: 0 0 22px rgba(255,45,149,0.14); letter-spacing: -0.5px; }
+  .label{ margin-top:6px; font-size:13px; color:var(--muted); font-weight:600; letter-spacing:0.6px; text-transform:uppercase; }
+
+  .note{ margin-top:12px; color:rgba(255,255,255,0.6); font-size:14px; }
+
+  /* right column: progress + artwork */
+  .side{
+    display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; padding:16px;
+  }
+  .progress-wrap{ width:100%; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .progress-label{ font-weight:700; color:var(--pink-1); letter-spacing:0.6px; text-transform:uppercase; font-size:13px; }
+  .percent{ font-size:28px; font-weight:800; color:#fff; text-shadow:0 0 6px rgba(0,0,0,0.5); }
+
+  /* circular SVG progress */
+  .progress-svg{ width:180px; height:180px; transform: rotate(-90deg); }
+  .progress-bg{ stroke: rgba(255,255,255,0.04); stroke-width:10; fill:none; }
+  .progress-ring{ stroke: url(#gradPink); stroke-width:10; stroke-linecap:round; fill:none; filter: drop-shadow(0 6px 16px rgba(255,45,149,0.08)); transition: stroke-dashoffset 600ms cubic-bezier(.2,.9,.22,1); }
+
+  /* baby icon & due date */
+  .due{
+    margin-top:6px; color:rgba(255,255,255,0.7); font-size:13px; text-align:center;
+  }
+  .baby-figure{ width:120px; height:120px; display:block; filter: drop-shadow(0 8px 20px rgba(255,45,149,0.08)); }
+
+  /* footer */
+  .meta{ margin-top:16px; color:rgba(255,255,255,0.18); font-size:12px; text-align:center; grid-column:1/-1; }
+
+  /* responsive */
+  @media (max-width:880px){
+    .card{ grid-template-columns: 1fr; padding:18px; }
+    .side{ order:-1; flex-direction:row; justify-content:space-between; gap:18px; }
+    .progress-wrap{ flex-direction:row; gap:12px; align-items:center; }
+  }
+</style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <!-- particles generated by JS; seeded defaults for graceful look if JS disabled -->
+    <div class="particle" style="width:320px; height:320px; left:-10%; top:5%; background:radial-gradient(circle,#ff6ab3,#ff2d95); animation-duration:24s;"></div>
+    <div class="particle" style="width:220px; height:220px; right:-8%; top:25%; background:radial-gradient(circle,#ff2d95,#ff6ab3); animation-duration:30s;"></div>
+    <div class="particle" style="width:140px; height:140px; left:20%; top:-12%; background:radial-gradient(circle,#ff6ab3,#ff2d95); animation-duration:18s;"></div>
+  </div>
+
+  <div class="wrap">
+    <div class="card" role="region" aria-label="Baby countdown for Szech and Poland">
+      <div>
+        <div class="title">
+          <div>
+            <h1>Szech & Poland</h1>
+            <div class="sub">A little neon arrival</div>
+          </div>
+          <div style="margin-left:auto;">
+            <span class="pill">Due: <strong id="dueShort" style="margin-left:8px;">May 3, 2026</strong></span>
+          </div>
+        </div>
+
+        <div class="accent-row" aria-hidden="true">
+          <div class="pill">Pink & Black</div>
+          <div class="pill">Stylish • Atmospheric</div>
+        </div>
+
+        <div class="countdown" id="countdown" aria-live="polite" aria-atomic="true">
+          <div class="segment" role="group" aria-label="Days remaining">
+            <div class="number" id="days">0</div>
+            <div class="label">Days</div>
+          </div>
+          <div class="segment" role="group" aria-label="Hours remaining">
+            <div class="number" id="hours">0</div>
+            <div class="label">Hours</div>
+          </div>
+          <div class="segment" role="group" aria-label="Minutes remaining">
+            <div class="number" id="minutes">0</div>
+            <div class="label">Minutes</div>
+          </div>
+          <div class="segment" role="group" aria-label="Seconds remaining">
+            <div class="number" id="seconds">0</div>
+            <div class="label">Seconds</div>
+          </div>
+        </div>
+
+        <div class="note" id="note">Counting down to your tiny neon arrival.</div>
+      </div>
+
+      <aside class="side" aria-hidden="false">
+        <div class="progress-wrap" role="img" aria-label="Pregnancy progress">
+          <svg class="progress-svg" viewBox="0 0 120 120" role="presentation">
+            <defs>
+              <linearGradient id="gradPink" x1="0%" x2="100%">
+                <stop offset="0%" stop-color="#ff6ab3"/>
+                <stop offset="100%" stop-color="#ff2d95"/>
+              </linearGradient>
+            </defs>
+            <circle class="progress-bg" cx="60" cy="60" r="50"></circle>
+            <circle class="progress-ring" cx="60" cy="60" r="50" stroke-dasharray="314.159" stroke-dashoffset="314.159"></circle>
+          </svg>
+          <div style="text-align:center;">
+            <div class="progress-label">Pregnancy progress</div>
+            <div class="percent" id="percent">0%</div>
+            <div class="due" id="dueFull">Due May 3, 2026 (local)</div>
+          </div>
+        </div>
+
+        <!-- decorative baby icon -->
+        <svg class="baby-figure" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="b" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff6ab3"/><stop offset="100%" stop-color="#ff2d95"/></linearGradient></defs>
+          <g fill="none" fill-rule="evenodd" transform="translate(10 8)">
+            <path d="M41 6c6 0 11 5 11 11s-5 11-11 11-11-5-11-11 5-11 11-11z" fill="url(#b)"/>
+            <path d="M7 60c0-12 12-26 34-26s34 14 34 26c0 14-15 24-34 24S7 74 7 60z" fill="rgba(255,255,255,0.04)"/>
+            <path d="M36 30c4 0 8 3 9 7 1 4-1 9-5 11-3 1-8 0-10-3s-2-9 1-13c1-2 4-2 5-2z" fill="#fff" opacity="0.06"/>
+          </g>
+        </svg>
+
+      </aside>
+
+      <div class="meta">Styled in pink & black — neon glow, subtle motion. Edit the due date in the script if needed.</div>
+    </div>
+  </div>
+
+<script>
+/*
+  Baby countdown script
+  - Due date used: May 3, 2026 (local timezone). If you meant a different year change the 'dueYear' variable.
+  - Progress assumes a 40-week (280 day) gestation: start = due - 280 days.
+*/
+
+(function(){
+  // ---------- CONFIG ----------
+  const dueYear = 2026;     // <-- change this if you meant a different year (e.g., 2025)
+  const dueMonthZeroIndex = 4; // May is month index 4 (0 = Jan)
+  const dueDateOfMonth = 3;     // 3rd
+  // create due date in local timezone (avoid parsing pitfalls)
+  const due = new Date(dueYear, dueMonthZeroIndex, dueDateOfMonth, 0, 0, 0, 0);
+
+  // DOM
+  const elDays = document.getElementById('days');
+  const elHours = document.getElementById('hours');
+  const elMinutes = document.getElementById('minutes');
+  const elSeconds = document.getElementById('seconds');
+  const elPercent = document.getElementById('percent');
+  const ring = document.querySelector('.progress-ring');
+  const dueShort = document.getElementById('dueShort');
+  const dueFull = document.getElementById('dueFull');
+  const note = document.getElementById('note');
+
+  // show formatted due strings
+  const options = { year:'numeric', month:'long', day:'numeric' };
+  dueShort.textContent = due.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+  dueFull.textContent = 'Due ' + due.toLocaleDateString(undefined, options) + ' (local)';
+
+  // progress circle setup
+  const R = 50; // radius in SVG coordinate
+  const CIRC = 2 * Math.PI * R;
+  ring.setAttribute('stroke-dasharray', CIRC.toFixed(3));
+  // set initial offset to full
+  ring.style.strokeDashoffset = CIRC.toFixed(3);
+
+  // pregnancy start = due - 280 days (40 weeks)
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const gestationDays = 280;
+  const start = new Date(due.getTime() - gestationDays * MS_PER_DAY);
+
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+  function update(){
+    const now = new Date();
+    const diff = due.getTime() - now.getTime();
+
+    if (diff <= 0) {
+      // due passed
+      elDays.textContent = '0';
+      elHours.textContent = '00';
+      elMinutes.textContent = '00';
+      elSeconds.textContent = '00';
+      elPercent.textContent = '100%';
+      ring.style.strokeDashoffset = '0';
+      note.textContent = "If baby has arrived — huge congratulations! 🎉";
+      return;
+    }
+
+    // compute time units (digit-by-digit style)
+    // total seconds remaining:
+    const totalSec = Math.floor(diff / 1000); // integer seconds remaining
+    const sec = totalSec % 60;
+    const totalMin = Math.floor(totalSec / 60);
+    const min = totalMin % 60;
+    const totalHours = Math.floor(totalMin / 60);
+    const hours = totalHours % 24;
+    const days = Math.floor(totalHours / 24);
+
+    // set DOM (pad numbers)
+    elDays.textContent = String(days);
+    elHours.textContent = String(hours).padStart(2,'0');
+    elMinutes.textContent = String(min).padStart(2,'0');
+    elSeconds.textContent = String(sec).padStart(2,'0');
+
+    // progress: fraction between start and due
+    const totalSpan = due.getTime() - start.getTime(); // ms between start and due
+    const elapsed = now.getTime() - start.getTime();
+    const frac = clamp(elapsed / totalSpan, 0, 1);
+    const pct = Math.round(frac * 100);
+    elPercent.textContent = pct + '%';
+
+    // update ring offset (circle is rotated -90deg via CSS)
+    const offset = (1 - frac) * CIRC;
+    ring.style.strokeDashoffset = offset.toFixed(3);
+
+    // subtle dynamic message
+    if (frac < 0.1) note.textContent = "Early days — growing quietly ✨";
+    else if (frac < 0.5) note.textContent = "Halfway there — gentle kicks incoming 💫";
+    else if (frac < 0.95) note.textContent = "Almost time — final preparations 💗";
+    else note.textContent = "Due very soon — breathe and glow 🌙";
+  }
+
+  // initial update
+  update();
+  // update every 250ms for smooth progress and snappy seconds (cheap)
+  const timer = setInterval(update, 250);
+
+  // particles: randomly seed more for visual depth
+  (function seedParticles(){
+    const scene = document.querySelector('.scene');
+    if (!scene) return;
+    const colours = ['#ff2d95','#ff6ab3','#ff4fa8'];
+    for(let i=0;i<6;i++){
+      const el = document.createElement('div');
+      el.className = 'particle';
+      const size = Math.round(80 + Math.random()*360);
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.left = Math.round(Math.random()*120 - 10) + '%';
+      el.style.top = Math.round(Math.random()*80 - 20) + '%';
+      el.style.background = `radial-gradient(circle, ${colours[Math.floor(Math.random()*colours.length)]}, rgba(255,255,255,0.02))`;
+      el.style.animationDuration = (18 + Math.random()*28) + 's';
+      el.style.opacity = (0.04 + Math.random()*0.08).toFixed(2);
+      scene.appendChild(el);
+    }
+  })();
+
+  // accessibility: ensure interval cleared if page hidden
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) clearInterval(timer);
+  });
+})();
+</script>
+</body>
+</html>
