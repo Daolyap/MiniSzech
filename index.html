@@ -3,122 +3,268 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Szech & Poland — Baby Countdown</title>
+<title>Baby Countdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0a;
-    --black:#050505;
-    --pink-1:#ff6ab3;
-    --pink-2:#ff2d95;
-    --glass: rgba(255,255,255,0.04);
-    --muted: rgba(255,255,255,0.12);
-    --neon: 0 0 18px rgba(255,45,149,0.18), 0 0 36px rgba(255,106,179,0.10);
-    --card-radius:18px;
+    --bg-dark:#050205;
+    --pink-glow:rgba(255,45,149,0.25);
+    --pink-hot:#ff2d95;
+    --pink-soft:#ff6ab3;
+    --glass-bg:rgba(255,255,255,0.03);
+    --glass-border:rgba(255,255,255,0.06);
+    --muted-text:rgba(255,255,255,0.3);
+    --card-radius:24px;
   }
-  html,body{height:100%;margin:0;font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: radial-gradient(1200px 600px at 10% 10%, rgba(255,45,149,0.06), transparent), radial-gradient(900px 400px at 90% 90%, rgba(255,106,179,0.04), transparent), var(--bg); color:#fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
-  /* subtle moving particles */
+  html,body{
+    height:100%;
+    margin:0;
+    font-family:'Poppins', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background-color:var(--bg-dark);
+    color:#fff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow:hidden;
+  }
   .scene{
-    position:fixed; inset:0; overflow:hidden; z-index:0;
-    background:linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.38) 100%);
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background:radial-gradient(ellipse at 50% 50%, rgba(255,45,149,0.1) 0%, transparent 70%);
+    animation: background-pulse 10s ease-in-out infinite;
+  }
+  @keyframes background-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.1; }
+    50% { transform: scale(1.2); opacity: 0.15; }
   }
   .particle{
-    position:absolute; border-radius:50%; opacity:0.08; mix-blend-mode:screen;
+    position:absolute;
+    border-radius:50%;
+    mix-blend-mode:screen;
     animation: drift linear infinite;
-    filter: blur(8px);
+    filter:blur(10px);
   }
   @keyframes drift {
-    from{ transform: translateY(-30vh) translateX(0) scale(0.6); opacity:0; }
-    10%{ opacity:0.06; }
-    50%{ opacity:0.08; }
-    to{ transform: translateY(120vh) translateX(40vw) scale(1); opacity:0; }
+    from{ transform: translateY(-20vh) translateX(0) scale(0.5); opacity:0; }
+    10%{ opacity:0.1; }
+    50%{ opacity:0.12; }
+    to{ transform: translateY(120vh) translateX(30vw) scale(1.2); opacity:0; }
   }
-
-  /* main layout */
-  .wrap{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:48px; z-index:1;}
+  .wrap{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:24px;
+    z-index:1;
+    animation: fade-in 1.5s ease-out;
+  }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   .card{
-    width:100%; max-width:980px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:var(--card-radius); padding:28px; backdrop-filter: blur(6px) saturate(1.08);
-    box-shadow: 0 8px 40px rgba(0,0,0,0.65), var(--neon); border:1px solid rgba(255,255,255,0.03);
-    display:grid; grid-template-columns: 1fr 360px; gap:22px; align-items:center;
+    width:100%;
+    max-width:980px;
+    background:var(--glass-bg);
+    border-radius:var(--card-radius);
+    padding:32px;
+    backdrop-filter:blur(12px) saturate(1.2);
+    box-shadow:0 12px 60px rgba(0,0,0,0.7), 0 0 40px var(--pink-glow);
+    border:1px solid var(--glass-border);
+    display:grid;
+    grid-template-columns:1fr 320px;
+    gap:28px;
+    align-items:center;
   }
-
-  /* left column: heading & countdown */
   .title{
-    display:flex; gap:14px; align-items:center; margin-bottom:6px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    margin-bottom:24px;
   }
-  .title h1{ margin:0; font-size: clamp(22px, 3.2vw, 32px); letter-spacing:0.6px; font-weight:700; color:var(--pink-1); text-shadow: 0 0 10px rgba(255,106,179,0.12); }
-  .title .sub{ color:var(--muted); font-weight:600; font-size:14px; letter-spacing:0.4px; text-transform:uppercase; }
-
-  .accent-row{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-  .pill{ padding:8px 12px; background: linear-gradient(90deg, rgba(255,45,149,0.08), rgba(255,106,179,0.04)); border-radius:999px; color: #ffd9ef; font-weight:600; font-size:13px; box-shadow: 0 2px 10px rgba(255,45,149,0.03) inset; }
-
+  .title h1{
+    margin:0;
+    font-size:clamp(28px, 4vw, 42px);
+    letter-spacing:0.5px;
+    font-weight:800;
+    color:var(--pink-soft);
+    text-shadow:0 0 12px var(--pink-glow);
+    animation: text-glow 3s ease-in-out infinite alternate;
+  }
+  @keyframes text-glow {
+    from { text-shadow:0 0 12px var(--pink-glow); }
+    to { text-shadow:0 0 24px rgba(255, 106, 179, 0.4); }
+  }
+  .pill{
+    padding:8px 14px;
+    background:rgba(255,45,149,0.1);
+    border-radius:999px;
+    color:#ffd9ef;
+    font-weight:600;
+    font-size:14px;
+    box-shadow:0 2px 10px rgba(255,45,149,0.05) inset;
+    width:fit-content;
+  }
   .countdown{
-    display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(110px, 1fr));
+    gap:18px;
   }
   .segment{
-    background: linear-gradient(180deg, rgba(0,0,0,0.42), rgba(255,255,255,0.02));
-    padding:18px 22px; border-radius:12px; min-width:120px; text-align:center; box-shadow: 0 6px 20px rgba(0,0,0,0.6);
-    border:1px solid rgba(255,255,255,0.02);
+    background:rgba(0,0,0,0.3);
+    padding:20px;
+    border-radius:16px;
+    text-align:center;
+    box-shadow:0 4px 20px rgba(0,0,0,0.5);
+    border:1px solid rgba(255,255,255,0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  .number{ font-size: clamp(28px, 4.4vw, 48px); font-weight:800; line-height:1; color:var(--pink-2); text-shadow: 0 0 22px rgba(255,45,149,0.14); letter-spacing: -0.5px; }
-  .label{ margin-top:6px; font-size:13px; color:var(--muted); font-weight:600; letter-spacing:0.6px; text-transform:uppercase; }
-
-  .note{ margin-top:12px; color:rgba(255,255,255,0.6); font-size:14px; }
-
-  /* right column: progress + artwork */
+  .segment:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 20px var(--pink-glow);
+  }
+  .number{
+    font-size:clamp(32px, 5vw, 52px);
+    font-weight:800;
+    line-height:1.1;
+    color:var(--pink-hot);
+    text-shadow:0 0 25px var(--pink-glow);
+  }
+  .label{
+    margin-top:8px;
+    font-size:13px;
+    color:var(--muted-text);
+    font-weight:600;
+    letter-spacing:0.8px;
+    text-transform:uppercase;
+  }
+  .note{
+    margin-top:20px;
+    color:rgba(255,255,255,0.7);
+    font-size:15px;
+    font-weight:400;
+  }
   .side{
-    display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:center; padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    align-items:center;
+    justify-content:center;
   }
-  .progress-wrap{ width:100%; display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .progress-label{ font-weight:700; color:var(--pink-1); letter-spacing:0.6px; text-transform:uppercase; font-size:13px; }
-  .percent{ font-size:28px; font-weight:800; color:#fff; text-shadow:0 0 6px rgba(0,0,0,0.5); }
-
-  /* circular SVG progress */
-  .progress-svg{ width:180px; height:180px; transform: rotate(-90deg); }
-  .progress-bg{ stroke: rgba(255,255,255,0.04); stroke-width:10; fill:none; }
-  .progress-ring{ stroke: url(#gradPink); stroke-width:10; stroke-linecap:round; fill:none; filter: drop-shadow(0 6px 16px rgba(255,45,149,0.08)); transition: stroke-dashoffset 600ms cubic-bezier(.2,.9,.22,1); }
-
-  /* baby icon & due date */
+  .progress-wrap{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    text-align:center;
+  }
+  .progress-label{
+    font-weight:700;
+    color:var(--pink-soft);
+    letter-spacing:0.8px;
+    text-transform:uppercase;
+    font-size:14px;
+  }
+  .percent{
+    font-size:32px;
+    font-weight:800;
+    color:#fff;
+    text-shadow:0 0 10px rgba(0,0,0,0.5);
+  }
+  .progress-svg{
+    width:180px;
+    height:180px;
+    transform:rotate(-90deg);
+  }
+  .progress-bg{
+    stroke:rgba(255,255,255,0.05);
+    stroke-width:12;
+    fill:none;
+  }
+  .progress-ring{
+    stroke:url(#gradPink);
+    stroke-width:12;
+    stroke-linecap:round;
+    fill:none;
+    filter:drop-shadow(0 0 10px var(--pink-glow));
+    transition:stroke-dashoffset 800ms cubic-bezier(.4, .4, .2, 1);
+  }
   .due{
-    margin-top:6px; color:rgba(255,255,255,0.7); font-size:13px; text-align:center;
+    margin-top:4px;
+    color:rgba(255,255,255,0.8);
+    font-size:14px;
+    text-align:center;
   }
-  .baby-figure{ width:120px; height:120px; display:block; filter: drop-shadow(0 8px 20px rgba(255,45,149,0.08)); }
-
-  /* footer */
-  .meta{ margin-top:16px; color:rgba(255,255,255,0.18); font-size:12px; text-align:center; grid-column:1/-1; }
-
-  /* responsive */
+  .baby-figure{
+    width:120px;
+    height:120px;
+    display:block;
+    filter:drop-shadow(0 10px 25px var(--pink-glow));
+    animation: baby-float 4s ease-in-out infinite;
+  }
+  @keyframes baby-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .meta{
+    margin-top:24px;
+    color:rgba(255,255,255,0.2);
+    font-size:12px;
+    text-align:center;
+    grid-column:1/-1;
+  }
   @media (max-width:880px){
-    .card{ grid-template-columns: 1fr; padding:18px; }
-    .side{ order:-1; flex-direction:row; justify-content:space-between; gap:18px; }
-    .progress-wrap{ flex-direction:row; gap:12px; align-items:center; }
+    .card{
+      grid-template-columns:1fr;
+      padding:24px;
+      gap:32px;
+    }
+    .side{
+      order:-1;
+      flex-direction:row;
+      justify-content:space-around;
+      gap:24px;
+      flex-wrap:wrap;
+    }
+    .progress-wrap{
+      flex-direction:column;
+    }
+    .title h1 {
+        text-align: center;
+    }
+    .pill {
+        margin: 0 auto;
+    }
+  }
+  @media (max-width:480px){
+    .wrap { padding: 16px; }
+    .card { padding: 18px; }
+    .countdown { gap: 12px; }
+    .segment { padding: 16px; }
+    .side { flex-direction: column; }
+    .title h1 { font-size: 26px; }
+    .number { font-size: 28px; }
   }
 </style>
 </head>
 <body>
   <div class="scene" aria-hidden="true">
-    <!-- particles generated by JS; seeded defaults for graceful look if JS disabled -->
-    <div class="particle" style="width:320px; height:320px; left:-10%; top:5%; background:radial-gradient(circle,#ff6ab3,#ff2d95); animation-duration:24s;"></div>
-    <div class="particle" style="width:220px; height:220px; right:-8%; top:25%; background:radial-gradient(circle,#ff2d95,#ff6ab3); animation-duration:30s;"></div>
-    <div class="particle" style="width:140px; height:140px; left:20%; top:-12%; background:radial-gradient(circle,#ff6ab3,#ff2d95); animation-duration:18s;"></div>
+    <div class="particle" style="width:350px; height:350px; left:-5%; top:10%; background:radial-gradient(circle, #ff6ab3, transparent); animation-duration:28s;"></div>
+    <div class="particle" style="width:250px; height:250px; right:-10%; top:30%; background:radial-gradient(circle, #ff2d95, transparent); animation-duration:35s;"></div>
+    <div class="particle" style="width:150px; height:150px; left:15%; top:-15%; background:radial-gradient(circle, #ff6ab3, transparent); animation-duration:20s;"></div>
   </div>
-
   <div class="wrap">
-    <div class="card" role="region" aria-label="Baby countdown for Szech and Poland">
+    <div class="card" role="region" aria-label="Baby Countdown">
       <div>
         <div class="title">
-          <div>
-            <h1>Szech & Poland</h1>
-            <div class="sub">A little neon arrival</div>
-          </div>
-          <div style="margin-left:auto;">
-            <span class="pill">Due: <strong id="dueShort" style="margin-left:8px;">May 3, 2026</strong></span>
-          </div>
-        </div>
-
-        <div class="accent-row" aria-hidden="true">
-          <div class="pill">Pink & Black</div>
-          <div class="pill">Stylish • Atmospheric</div>
+          <h1>Our Baby Countdown</h1>
+          <div class="pill">Due: <strong id="dueShort">May 3, 2026</strong></div>
         </div>
 
         <div class="countdown" id="countdown" aria-live="polite" aria-atomic="true">
@@ -140,29 +286,30 @@
           </div>
         </div>
 
-        <div class="note" id="note">Counting down to your tiny neon arrival.</div>
+        <p class="note" id="note">Counting down the moments until we meet our little one.</p>
       </div>
 
-      <aside class="side" aria-hidden="false">
+      <aside class="side">
         <div class="progress-wrap" role="img" aria-label="Pregnancy progress">
-          <svg class="progress-svg" viewBox="0 0 120 120" role="presentation">
-            <defs>
-              <linearGradient id="gradPink" x1="0%" x2="100%">
-                <stop offset="0%" stop-color="#ff6ab3"/>
-                <stop offset="100%" stop-color="#ff2d95"/>
-              </linearGradient>
-            </defs>
-            <circle class="progress-bg" cx="60" cy="60" r="50"></circle>
-            <circle class="progress-ring" cx="60" cy="60" r="50" stroke-dasharray="314.159" stroke-dashoffset="314.159"></circle>
-          </svg>
+          <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+            <svg class="progress-svg" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="gradPink" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff6ab3"/>
+                  <stop offset="100%" stop-color="#ff2d95"/>
+                </linearGradient>
+              </defs>
+              <circle class="progress-bg" cx="60" cy="60" r="54"></circle>
+              <circle class="progress-ring" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="339.292"></circle>
+            </svg>
+            <div class="percent" id="percent" style="position: absolute; font-weight: 700;">0%</div>
+          </div>
           <div style="text-align:center;">
-            <div class="progress-label">Pregnancy progress</div>
-            <div class="percent" id="percent">0%</div>
-            <div class="due" id="dueFull">Due May 3, 2026 (local)</div>
+            <div class="progress-label">Pregnancy Progress</div>
+            <div class="due" id="dueFull">Due May 3, 2026</div>
           </div>
         </div>
 
-        <!-- decorative baby icon -->
         <svg class="baby-figure" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs><linearGradient id="b" x1="0%" x2="100%"><stop offset="0%" stop-color="#ff6ab3"/><stop offset="100%" stop-color="#ff2d95"/></linearGradient></defs>
           <g fill="none" fill-rule="evenodd" transform="translate(10 8)">
@@ -174,26 +321,17 @@
 
       </aside>
 
-      <div class="meta">Styled in pink & black — neon glow, subtle motion. Edit the due date in the script if needed.</div>
+      <div class="meta">Designed with love.</div>
     </div>
   </div>
 
 <script>
-/*
-  Baby countdown script
-  - Due date used: May 3, 2026 (local timezone). If you meant a different year change the 'dueYear' variable.
-  - Progress assumes a 40-week (280 day) gestation: start = due - 280 days.
-*/
-
 (function(){
-  // ---------- CONFIG ----------
-  const dueYear = 2026;     // <-- change this if you meant a different year (e.g., 2025)
-  const dueMonthZeroIndex = 4; // May is month index 4 (0 = Jan)
-  const dueDateOfMonth = 3;     // 3rd
-  // create due date in local timezone (avoid parsing pitfalls)
+  const dueYear = 2026;
+  const dueMonthZeroIndex = 4;
+  const dueDateOfMonth = 3;
   const due = new Date(dueYear, dueMonthZeroIndex, dueDateOfMonth, 0, 0, 0, 0);
 
-  // DOM
   const elDays = document.getElementById('days');
   const elHours = document.getElementById('hours');
   const elMinutes = document.getElementById('minutes');
@@ -204,20 +342,16 @@
   const dueFull = document.getElementById('dueFull');
   const note = document.getElementById('note');
 
-  // show formatted due strings
   const options = { year:'numeric', month:'long', day:'numeric' };
   dueShort.textContent = due.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
-  dueFull.textContent = 'Due ' + due.toLocaleDateString(undefined, options) + ' (local)';
+  dueFull.textContent = 'Due ' + due.toLocaleDateString(undefined, options);
 
-  // progress circle setup
-  const R = 50; // radius in SVG coordinate
+  const R = ring.r.baseVal.value;
   const CIRC = 2 * Math.PI * R;
-  ring.setAttribute('stroke-dasharray', CIRC.toFixed(3));
-  // set initial offset to full
-  ring.style.strokeDashoffset = CIRC.toFixed(3);
+  ring.style.strokeDasharray = `${CIRC} ${CIRC}`;
+  ring.style.strokeDashoffset = CIRC;
 
-  // pregnancy start = due - 280 days (40 weeks)
-  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const MS_PER_DAY = 1000 * 60 * 60 * 24;
   const gestationDays = 280;
   const start = new Date(due.getTime() - gestationDays * MS_PER_DAY);
 
@@ -228,20 +362,18 @@
     const diff = due.getTime() - now.getTime();
 
     if (diff <= 0) {
-      // due passed
       elDays.textContent = '0';
       elHours.textContent = '00';
       elMinutes.textContent = '00';
       elSeconds.textContent = '00';
       elPercent.textContent = '100%';
-      ring.style.strokeDashoffset = '0';
-      note.textContent = "If baby has arrived — huge congratulations! 🎉";
+      ring.style.strokeDashoffset = 0;
+      note.textContent = "Welcome to the world, little one! 🎉";
+      clearInterval(timer);
       return;
     }
 
-    // compute time units (digit-by-digit style)
-    // total seconds remaining:
-    const totalSec = Math.floor(diff / 1000); // integer seconds remaining
+    const totalSec = Math.floor(diff / 1000);
     const sec = totalSec % 60;
     const totalMin = Math.floor(totalSec / 60);
     const min = totalMin % 60;
@@ -249,58 +381,55 @@
     const hours = totalHours % 24;
     const days = Math.floor(totalHours / 24);
 
-    // set DOM (pad numbers)
     elDays.textContent = String(days);
     elHours.textContent = String(hours).padStart(2,'0');
     elMinutes.textContent = String(min).padStart(2,'0');
     elSeconds.textContent = String(sec).padStart(2,'0');
 
-    // progress: fraction between start and due
-    const totalSpan = due.getTime() - start.getTime(); // ms between start and due
+    const totalSpan = due.getTime() - start.getTime();
     const elapsed = now.getTime() - start.getTime();
     const frac = clamp(elapsed / totalSpan, 0, 1);
-    const pct = Math.round(frac * 100);
+    const pct = Math.floor(frac * 100);
     elPercent.textContent = pct + '%';
 
-    // update ring offset (circle is rotated -90deg via CSS)
     const offset = (1 - frac) * CIRC;
-    ring.style.strokeDashoffset = offset.toFixed(3);
+    ring.style.strokeDashoffset = offset;
 
-    // subtle dynamic message
-    if (frac < 0.1) note.textContent = "Early days — growing quietly ✨";
-    else if (frac < 0.5) note.textContent = "Halfway there — gentle kicks incoming 💫";
-    else if (frac < 0.95) note.textContent = "Almost time — final preparations 💗";
-    else note.textContent = "Due very soon — breathe and glow 🌙";
+    if (frac < 0.1) note.textContent = "The beautiful journey has just begun. ✨";
+    else if (frac < 0.5) note.textContent = "Feeling the first flutters of love. 💫";
+    else if (frac < 0.95) note.textContent = "Getting ready to meet you. 💗";
+    else note.textContent = "Any day now... breathe and wait for the magic. 🌙";
   }
 
-  // initial update
+  const timer = setInterval(update, 1000);
   update();
-  // update every 250ms for smooth progress and snappy seconds (cheap)
-  const timer = setInterval(update, 250);
 
-  // particles: randomly seed more for visual depth
   (function seedParticles(){
     const scene = document.querySelector('.scene');
     if (!scene) return;
     const colours = ['#ff2d95','#ff6ab3','#ff4fa8'];
-    for(let i=0;i<6;i++){
+    for(let i=0;i<10;i++){
       const el = document.createElement('div');
       el.className = 'particle';
-      const size = Math.round(80 + Math.random()*360);
+      const size = Math.round(50 + Math.random()*250);
       el.style.width = size + 'px';
       el.style.height = size + 'px';
-      el.style.left = Math.round(Math.random()*120 - 10) + '%';
-      el.style.top = Math.round(Math.random()*80 - 20) + '%';
-      el.style.background = `radial-gradient(circle, ${colours[Math.floor(Math.random()*colours.length)]}, rgba(255,255,255,0.02))`;
-      el.style.animationDuration = (18 + Math.random()*28) + 's';
-      el.style.opacity = (0.04 + Math.random()*0.08).toFixed(2);
+      el.style.left = Math.round(Math.random()*110 - 5) + '%';
+      el.style.top = Math.round(Math.random()*90 - 10) + '%';
+      el.style.background = `radial-gradient(circle, ${colours[Math.floor(Math.random()*colours.length)]}, transparent)`;
+      el.style.animationDuration = (20 + Math.random()*25) + 's';
+      el.style.animationDelay = (Math.random() * -30) + 's';
+      el.style.opacity = (0.05 + Math.random()*0.1).toFixed(2);
       scene.appendChild(el);
     }
   })();
-
-  // accessibility: ensure interval cleared if page hidden
+  
   document.addEventListener('visibilitychange', function(){
-    if (document.hidden) clearInterval(timer);
+    if (document.hidden) {
+      clearInterval(timer);
+    } else {
+      setInterval(update, 1000);
+    }
   });
 })();
 </script>
